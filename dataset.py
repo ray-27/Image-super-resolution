@@ -7,7 +7,7 @@ import os
 from scipy.ndimage import convolve
 import torch.nn.functional as F
 import cv2 as cv
-
+import matplotlib.pyplot as plt
 
 class Div2kDataset(Dataset):
     def __init__(self, data, target, transform=None):
@@ -101,4 +101,10 @@ if __name__ == "__main__":
         print(f'Batch {idx+1}')
         print(f'hr shape : {x.shape}')
         print(f'lr shape : {y.shape}')
+        data = x.squeeze(0).squeeze(0).numpy()
+        target = y.squeeze(0).squeeze(0).numpy()
+        break
+
+    cv.imwrite('output/hr_edge.jpg',data)
+    cv.imwrite('output/lr_edge.jpg',target)
         

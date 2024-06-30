@@ -4,6 +4,7 @@ import pandas as pd
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
+from colorama import Fore, Back, Style, init
 
 """
 This file contains utility functions that can be used in the main code.
@@ -50,18 +51,16 @@ def ssim(original, enhanced,win_size=7):
     enhanced_np = enhanced.cpu().numpy().transpose(1, 2, 0)
     return structural_similarity(original_np, enhanced_np, multichannel=True, data_range=1, win_size=win_size, channel_axis=2)
 
+################# CLi #################
+init(autoreset=True)
+def print_g(s):
+    print(Fore.GREEN + s)
+
 
 
 
 ################# a main func to test any func #################
 if __name__ == "__main__":
-    original_image = torch.rand((3, 256, 256))  # Dummy original image
-    enhanced_image = torch.rand((3, 256, 256))  # Dummy enhanced image
-
-    mse = mse_loss(original_image, enhanced_image)
-    psnr_value = psnr(original_image, enhanced_image)
-    ssim_value = ssim(original_image, enhanced_image)
-
-    print(f"MSE: {mse.item()}")
-    print(f"PSNR: {psnr_value}")
-    print(f"SSIM: {ssim_value}")
+    a = 2
+    print_g(f"this si : {a} ")
+    print("asd")
