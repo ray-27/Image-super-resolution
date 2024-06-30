@@ -24,6 +24,6 @@ I can be found on [sage](https://sage.buildspace.so/@rajveer-yadav-1xfHiyq) ,[li
 - So here's my one liner _an ai model that upscales image_. 
 - My plan is to first start with building a model that upscales the resolution of image which has edges that is a grayscale image 
 
-![[for buildspace /edgemodel_idea.png|700]]
+![[for_buildspace /edgemodel_idea.png|700]]
 
 - then i'll work towards combining this model with the 3 channels RGB model on a similar but efficient architecture.
