@@ -8,6 +8,7 @@ from scipy.ndimage import convolve
 import torch.nn.functional as F
 import cv2 as cv
 import matplotlib.pyplot as plt
+import config
 
 class Div2kDataset(Dataset):
     def __init__(self, data, target, transform=None):
@@ -42,11 +43,6 @@ class EdgeDataset(Dataset):
 
 
         # Define a simple edge detection kernel
-        kernel = np.array([
-                        [1, 0, -1],
-                        [2, 0, -2],
-                        [1, 0, -1]])
-
         self.hr_edge_tensor = torch.tensor([])
         self.lr_edge_tensor = torch.tensor([])
         count = 0
@@ -73,7 +69,7 @@ class EdgeDataset(Dataset):
             hr_pad_tensor = F.pad(hr_img, (padding_left, padding_right, padding_top, padding_bottom))
 
             hr_pad_tensor_t = hr_pad_tensor.unsqueeze(0).to(torch.float32)
-            ss = 2040//4
+            ss = hr_size//scale
             lr_img_tensor = F.interpolate(hr_pad_tensor_t, size=(ss,ss), mode='bicubic', align_corners=False)
 
             # lr_img_tensor = lr_img_tensor.squeeze(0)
@@ -94,7 +90,7 @@ class EdgeDataset(Dataset):
 
 if __name__ == "__main__":
 
-    dataset = EdgeDataset()
+    dataset = EdgeDataset(config.dataset_path)
     loader = DataLoader(dataset, batch_size=1, shuffle=True)
 
     for idx, (x,y) in enumerate(loader):

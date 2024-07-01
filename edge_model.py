@@ -4,6 +4,7 @@ import torch.nn.functional as F
 import numpy as np
 import os
 from dataset import Div2kDataset, EdgeDataset
+from torchsummary import summary
 
 class Gen_ResudialBlock(nn.Module):
     def __init__(self, in_channels,kernel_size=3,stride=1,num_channels=64):
@@ -110,7 +111,7 @@ class Edge_Discriminator(nn.Module):
         )
 
 
-        self.dense_1 = nn.Linear(524288,10,bias=True)
+        self.dense_1 = nn.Linear(num_channels[3]*128*128,10,bias=True)
         self.lrelu = nn.LeakyReLU(lekey_relu)
         self.dense_2 = nn.Linear(10,1,bias=True)
         self.sigmoid = nn.Sigmoid()
@@ -119,9 +120,9 @@ class Edge_Discriminator(nn.Module):
 
         x = self.conv_1(x)
         x = self.lrelu(x)
-        print(f'before resudial block : {x.shape}')
+        # print(f'before resudial block : {x.shape}')
         x = self.resudial_blocks(x)
-        print(x.shape)
+        # print(x.shape)
         x = x.view(x.size(0),-1)
         x = self.dense_1(x)
         x = self.lrelu(x)
@@ -136,11 +137,12 @@ if __name__ == "__main__":
 
     x = torch.randn(1,1,510,510)
     # model = Edge_Generator(1,num_channels=8,num_res_blocks=8)
-    model = Edge_Discriminator()
-    y = model(x)
-    print(y.shape)
-    print(y[0].item())
-    # summary(model,(1,2040,2040))
+    gen = Edge_Generator(1,num_channels=8,num_res_blocks=8)
+    dis = Edge_Discriminator()
+        
+
+    summary(gen,(1,510,510))
+    summary(dis,(1,2040,2040))
     
 
 
