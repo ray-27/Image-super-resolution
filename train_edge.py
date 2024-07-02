@@ -1,7 +1,7 @@
 
 import config
 
-from dataset import EdgeDataset, Div2kDataset,Edge_3_dataset
+from dataset import EdgeDataset, Div2kDataset
 from edge_model import Edge_Generator, Edge_Discriminator
 from torch.utils.data import DataLoader
 import torch
@@ -9,10 +9,6 @@ import torch.nn as nn
 from tqdm import tqdm
 import torch.optim as optim
 from loss import Edge_Gradient_loss, VGGLoss
-
-import wandb
-
-wandb.init(project='super_resolution',)
 
 
 
@@ -22,8 +18,6 @@ def train(dataset,generator, discriminator, opt_gen, opt_disc, mse, bce, vgg_los
 
     generator = generator.to(device)
     discriminator = discriminator.to(device)
-
-    wandb.watch(generator, log='all')
 
 
     #training loop
@@ -77,28 +71,18 @@ def train(dataset,generator, discriminator, opt_gen, opt_disc, mse, bce, vgg_los
             gen_loss.backward()
             opt_gen.step()
 
-            wandb.log({"gen_loss": gen_loss.item(), "dis_loss": loss_disc.item()})
             if idx % 4 == 0:
-                tqdm.write(f'Epoch {epoch + 1}/{epochs}, Batch {idx + 1}/{len(loader)}, Gen Loss : {gen_loss.item()}, Dis Loss : {loss_disc.item()}')#, Dis Loss : {dis_loss.item()}')
+                tqdm.write(f'Epoch {epoch + 1}/{epochs}, Batch {idx + 1}/{len(loader)}, Gen Loss : {gen_loss.item()}')#, Dis Loss : {dis_loss.item()}')
 
+            
     
-    # saving the generator and discriminator after training
-    torch.save(generator, f'{config.gen_model_name}.pth')
-    torch.save(discriminator, f'{config.dis_model_name}.pth')
-
-    artifact = wandb.Artifact('model', type='model')
-    artifact.add_file(f'{config.gen_model_name}.pth')
-    wandb.log_artifact(artifact)
-    wandb.finish()
-
 
 
 
 if __name__ == "__main__":
-    # dataset = EdgeDataset(config.dataset_path,sample_size=config.sample_size)
+    dataset = EdgeDataset(config.dataset_path,sample_size=config.sample_size)
     # dataset = Div2kDataset(config.dataset_path,sample_size=config.sample_size)
-    dataset = Edge_3_dataset(config.dataset_path,sample_size=config.sample_size)
-    generator = Edge_Generator(3,num_channels=config.num_channels,
+    generator = Edge_Generator(1,num_channels=config.num_channels,
                                num_res_blocks=config.num_res_blocks)
     discriminator = Edge_Discriminator(in_channels=3)
     # criterion = nn.MSELoss()
@@ -114,7 +98,7 @@ if __name__ == "__main__":
     opt_disc = optim.Adam(discriminator.parameters(), lr=config.dis_lr, betas=(0.9, 0.999))
     mse = nn.MSELoss()
     bce = nn.BCEWithLogitsLoss()
-    vgg_loss = VGGLoss()
+    vgg_loss = Edge_Gradient_loss()
 
     train(dataset, generator, discriminator, opt_gen, opt_disc, mse, bce, vgg_loss, device,epochs=epochs)
         

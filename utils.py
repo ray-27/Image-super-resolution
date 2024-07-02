@@ -36,7 +36,7 @@ def psnr(original, enhanced):
     mse = mse_loss(original, enhanced)
     return 10 * torch.log10(1 / mse)
 
-def ssim(original, enhanced,win_size=7):
+def ssim(original, enhanced,win_size=7,multichannel=False):
     """
     SSIM is a perceptual metric that quantifies the image quality degradation caused by processing such as data compression or by losses in data transmission.
     It considers changes in structural information, luminance, and contrast.
@@ -49,7 +49,7 @@ def ssim(original, enhanced,win_size=7):
     
     original_np = original.cpu().numpy().transpose(1, 2, 0)
     enhanced_np = enhanced.cpu().numpy().transpose(1, 2, 0)
-    return structural_similarity(original_np, enhanced_np, multichannel=True, data_range=1, win_size=win_size, channel_axis=2)
+    return structural_similarity(original_np, enhanced_np, multichannel=multichannel, data_range=1, win_size=win_size, channel_axis=2)
 
 ################# CLi #################
 init(autoreset=True)
