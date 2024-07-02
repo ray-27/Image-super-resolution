@@ -83,8 +83,10 @@ def train(dataset,generator, discriminator, opt_gen, opt_disc, mse, bce, vgg_los
 
     
     # saving the generator and discriminator after training
-    torch.save(generator, f'{config.gen_model_name}.pth')
-    torch.save(discriminator, f'{config.dis_model_name}.pth')
+    gen_model_name = config.gen_model_name
+    dis_model_name = config.dis_model_name
+    torch.save(generator, gen_model_name)
+    torch.save(discriminator, dis_model_name)
 
     artifact = wandb.Artifact('model', type='model')
     artifact.add_file(f'{config.gen_model_name}.pth')
