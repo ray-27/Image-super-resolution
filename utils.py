@@ -68,7 +68,8 @@ def print_semi(string, input, color='g'):
     else:
         print(Fore.GREEN + string, input)
 
-
+def dash():
+    print('-------------------------------------------------------------')
 
 
 ################# a main func to test any func #################
