@@ -85,8 +85,12 @@ def train(dataset,generator, discriminator, opt_gen, opt_disc, mse, bce, vgg_los
     # saving the generator and discriminator after training
     gen_model_name = config.gen_model_name
     dis_model_name = config.dis_model_name
-    torch.save(generator, gen_model_name)
-    torch.save(discriminator, dis_model_name)
+    for name, module in generator.named_modules():
+        if hasattr(module, '_forward_hooks'):
+            module._forward_hooks.clear()
+
+    torch.save(generator, "gen_model.pt")
+    torch.save(discriminator, "dis_model.pt")
 
     artifact = wandb.Artifact('model', type='model')
     artifact.add_file(f'{config.gen_model_name}.pth')
@@ -100,6 +104,7 @@ if __name__ == "__main__":
     # dataset = EdgeDataset(config.dataset_path,sample_size=config.sample_size)
     # dataset = Div2kDataset(config.dataset_path,sample_size=config.sample_size)
     dataset = Edge_3_dataset(config.dataset_path,sample_size=config.sample_size)
+    
     generator = Edge_Generator(3,num_channels=config.num_channels,
                                num_res_blocks=config.num_res_blocks)
     discriminator = Edge_Discriminator(in_channels=3)

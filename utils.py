@@ -56,11 +56,22 @@ init(autoreset=True)
 def print_g(s):
     print(Fore.GREEN + s)
 
+def print_semi(string, input, color='g'):
+    if color == 'g':
+        print(string,Fore.GREEN + input)
+    elif color == 'r':
+        print(string,Fore.RED + input)
+    elif color == 'b':
+        print(string, Fore.BLUE + input)
+    elif color == 'y':
+        print(string,Fore.YELLOW + input)
+    else:
+        print(Fore.GREEN + string, input)
+
 
 
 
 ################# a main func to test any func #################
 if __name__ == "__main__":
     a = 2
-    print_g(f"this si : {a} ")
-    print("asd")
+    print_semi("this", "gpu",'y')

@@ -13,6 +13,10 @@ import config
 class Div2kDataset(Dataset):
     def __init__(self, hr_dir='local_data/small set of div2k (20)',sample_size=-1,hr_size=2040,scale=4):
         
+        ## printing the confif of dataset
+        print(f'HR directory : \t {hr_dir}')
+        print(f'scale : \t {scale}')
+        print(f'Sample size : \t {sample_size}')
         self.sample_size = sample_size
         self.hr_size = hr_size
         self.hr_edge_tensor = torch.tensor([])

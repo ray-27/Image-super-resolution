@@ -1,3 +1,9 @@
-/data
+/local_data
 /output
 test.ipynb
+__pycache__/
+.DS_Store
+wandb/
+model_output/
+load_model.ipynb
+Edge_Generator.pth

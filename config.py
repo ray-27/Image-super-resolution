@@ -1,6 +1,6 @@
 import torch
 
-device = 'cpu'#'cuda' if torch.cuda.is_available() else 'cpu'
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 # Configuration file for the project
 dataset_path = 'data/div2k-sample-50'
@@ -20,5 +20,5 @@ num_channels=1
 num_res_blocks=1
 
 # model details
-gen_model_name = 'Edge_Generator'
-dis_model_name = 'Edge_Discriminator'
+gen_model_name = 'Edge_Generator.pth'
+dis_model_name = 'Edge_Discriminator.pth'
