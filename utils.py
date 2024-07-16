@@ -65,6 +65,8 @@ def print_semi(string, input, color='g'):
         print(string, Fore.BLUE + input)
     elif color == 'y':
         print(string,Fore.YELLOW + input)
+    elif color == 'w':
+        print(string,Fore.WHITE + input)
     else:
         print(Fore.GREEN + string, input)
 

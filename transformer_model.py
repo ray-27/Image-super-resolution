@@ -3,10 +3,11 @@ import torch.nn as nn
 import torch.nn.functional as F
 import math
 import numpy as np
-
+from torchsummary import summary
 from utils import print_semi,dash
 
-class multi_head(nn.Module):
+
+class MultiHeadAttention(nn.Module):
     def __init__(self, embed_dim, num_heads):
         """
         embed_dim: int
@@ -19,9 +20,9 @@ class multi_head(nn.Module):
         self.embed_dim = embed_dim
         self.num_heads = num_heads
         self.head_dim = embed_dim // num_heads
-        print_semi("","multi-head attention:",'y')
-        print(f' embed_dim: \t{embed_dim}\n num_heads: \t{num_heads}\n head_dim: \t{self.head_dim}')    
-        dash()
+        # print_semi("","multi-head attention:",'y')
+        # print(f' embed_dim: \t{embed_dim}\n num_heads: \t{num_heads}\n head_dim: \t{self.head_dim}')    
+        # dash()
 
         assert self.head_dim * num_heads == self.embed_dim, "embed_dim must be divisible by num_heads"
            
@@ -45,17 +46,66 @@ class multi_head(nn.Module):
         
         return attn_output
     
+class PositionwiseFeedForward(nn.Module):
+
+    def __init__(self, embed_dim, ff_dim=2048, dropout_rate=0.1):
+        super().__init__()
+        self.fc1 = nn.Linear(embed_dim, ff_dim)
+        self.fc2 = nn.Linear(ff_dim, embed_dim)
+        self.dropout = nn.Dropout(dropout_rate)
+        self.activation = nn.ReLU()
+
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.activation(x)
+        x = self.dropout(x)
+        x = self.fc2(x)
+        return x
+
+class Encoder(nn.Module):
+    """
+    Encodes the target image into a sequence of feature vectors.
+    """
+    def __init__(self, embed_dim, num_heads, ff_dim=2048, num_layers=3,dropout_rate=0.1):
+        super().__init__()
+        self.attention_layers = nn.Sequential(*[MultiHeadAttention(embed_dim, num_heads) for _ in range(num_layers)])
+        self.normalization_layer_1 = nn.LayerNorm(embed_dim)
+        self.normalization_layer_2 = nn.LayerNorm(embed_dim)
+        self.dropout1 = nn.Dropout(dropout_rate)
+        self.dropout2 = nn.Dropout(dropout_rate)
+        self.feed_forward = PositionwiseFeedForward(embed_dim, ff_dim, dropout_rate)
+
+    
+    def forward(self,x):
+        att = self.attention_layers(x)
+        x = x + self.dropout1(att)
+        x = self.normalization_layer_1(x)
+
+        feed_forward_x = self.feed_forward(x)
+        x = x + self.dropout2(feed_forward_x)
+        x = self.normalization_layer_2(x)
+        return x
+
 
 if __name__ == '__main__':
     embed_dim = 516
     num_heads = 3
-    model = multi_head(embed_dim, num_heads)
+    enc_model = Encoder(embed_dim, num_heads)
+    att = MultiHeadAttention(embed_dim, num_heads)
     
-    t = torch.rand(4,3,225,225)
+    i = torch.rand(4,3,225,225)
+    t = torch.rand(4,3,4*225,4*225)
     proj = nn.Conv2d(3,embed_dim,3,3)
-    x = proj(t)
-    flat = x.flatten(2).transpose(1,2)
-    print(f'flat shape: {flat.shape}')
-    for _ in range(3):
-        flat = model(flat)
-    print(f'out shape: {flat.shape}')
+    x_t = proj(t)
+    x_i = proj(i)
+    flat_t = x_t.flatten(2).transpose(1,2)
+    flat_i = x_i.flatten(2).transpose(1,2)
+    print(f'flat shape: {flat_i.shape}')
+    print(f'flat shape: {flat_t.shape}')
+
+    # enc_out = enc_model(flat_t)
+    att_out = att(flat_i)
+    # print_semi("encoder output:\t",str(enc_out.shape),'g')
+    print_semi("attention output:\t",str(att_out.shape),'y')
+
+    
